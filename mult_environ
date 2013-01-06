@@ -1,0 +1,87 @@
+#!/bin/bash
+
+#	 
+#	Simple script to easily deploy to multiple environments
+#	on Heroku when code is hosted on a remote git repo 
+#
+#	Chris Wendel 
+#
+
+if ! [ -d .git ]; then
+	echo "This is not a git repo..."
+	echo "You sure you're in the base directory for your project?"
+	exit -1
+fi;
+
+git ls-remote origin
+if test $? != 0; then
+	echo "No remote origin, push code to remote repo and try again"
+	exit -1
+fi;
+
+# Ask user for name of secondary(staging) brang
+echo "Enter altername name of staging branch [ENTER to use default 'staging']"
+read name
+
+if [ -z "$name" ]; then
+	name="staging"
+fi;
+
+# Create the staging branch
+echo "Creating a new branch named $name"
+git checkout -b $name
+
+# Push to your remote repo
+echo "Pushing to remote git repo, branch $name"
+git push origin $name
+
+# Create the prod and stage heroku apps
+while true
+do
+	echo "Enter heroku app name"
+	read heroku_name
+	heroku_stage="$heroku_name-stage"
+	heroku_prod="$heroku_name-prod"
+
+	# Create the heroku staging app
+	heroku create $heroku_stage --remote heroku-staging
+
+	if test $? != 0; then
+ 		echo "Heroku app name taken"
+ 	else
+ 		# Create the heroku prod app
+		heroku create $heroku_prod --remote heroku-prod
+
+		if test $? != 0; then
+	 		echo "Heroku app name taken"
+	 	else
+	 		break
+	 	fi;
+ 	fi;
+done
+
+# Switch back to the master branch
+git checkout master
+
+# Push code from staging branch to the heroku-staging master branch
+git push heroku-staging staging:master
+git checkout staging
+
+if [ -f "rakefile" ]; then
+	heroku run rake db:migrate --app $heroku_stage
+else
+	echo "No Rakefile found"
+fi
+
+# Push code from prod app and migrate the db
+git checkout master
+git push heroku-prod master
+
+if [ -f "rakefile" ]; then
+	heroku run rake db:migrate --app $heroku_prod 
+else
+	echo "No Rakefile found"
+fi
+
+
+
