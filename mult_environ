@@ -80,30 +80,6 @@ do
 	fi
 done
 
-# while true
-# do
-# 	echo "Enter heroku app name"
-# 	read heroku_name
-# 	heroku_stage="$heroku_name-stage"
-# 	heroku_prod="$heroku_name-prod"
-
-# 	# Create the heroku staging app
-# 	heroku create $heroku_stage --remote heroku-staging
-
-# 	if test $? != 0; then
-#  		echo "Heroku app name taken"
-#  	else
-#  		# Create the heroku prod app
-# 		heroku create $heroku_prod --remote heroku-prod
-
-# 		if test $? != 0; then
-# 	 		echo "Heroku app name taken"
-# 	 	else
-# 	 		break
-# 	 	fi;
-#  	fi;
-# done
-
 # Push code from staging branch to the heroku-staging master branch
 git push heroku-staging staging:master
 git checkout staging
