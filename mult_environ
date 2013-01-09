@@ -35,33 +35,74 @@ git checkout -b $name
 echo "Pushing to remote git repo, branch $name"
 git push origin $name
 
-# Create the prod and stage heroku apps
+# Create the staging heroku app
 while true
-do
-	echo "Enter heroku app name"
-	read heroku_name
-	heroku_stage="$heroku_name-stage"
-	heroku_prod="$heroku_name-prod"
+do 
+	echo "Enter heroku staging app name [Example: My-App-Staging]"
+	read heroku_stage
 
-	# Create the heroku staging app
-	heroku create $heroku_stage --remote heroku-staging
-
-	if test $? != 0; then
- 		echo "Heroku app name taken"
- 	else
- 		# Create the heroku prod app
-		heroku create $heroku_prod --remote heroku-prod
+	if [[ -n "$heroku_stage" ]]; then
+		# Create the heroku staging app
+		heroku create $heroku_stage --remote heroku-staging
 
 		if test $? != 0; then
-	 		echo "Heroku app name taken"
-	 	else
-	 		break
-	 	fi;
- 	fi;
+			echo "Heroku app name taken"
+		else
+			break
+		fi
+	else
+		echo "App name can not be empty"
+	fi
 done
+
 
 # Switch back to the master branch
 git checkout master
+
+
+# Create the prod heroku app
+while true
+do
+	echo "Enter heroku prod app name [Example: My-App-Prod]"
+	read heroku_prod
+
+	if [[ -n "$heroku_prod" ]]; then
+		# Create the heroku staging app
+		heroku create $heroku_prod --remote heroku-prod
+
+		if test $? != 0; then
+			echo "Heroku app name taken"
+		else
+			break
+		fi
+	else
+		echo "App name can not be empty"
+	fi
+done
+
+# while true
+# do
+# 	echo "Enter heroku app name"
+# 	read heroku_name
+# 	heroku_stage="$heroku_name-stage"
+# 	heroku_prod="$heroku_name-prod"
+
+# 	# Create the heroku staging app
+# 	heroku create $heroku_stage --remote heroku-staging
+
+# 	if test $? != 0; then
+#  		echo "Heroku app name taken"
+#  	else
+#  		# Create the heroku prod app
+# 		heroku create $heroku_prod --remote heroku-prod
+
+# 		if test $? != 0; then
+# 	 		echo "Heroku app name taken"
+# 	 	else
+# 	 		break
+# 	 	fi;
+#  	fi;
+# done
 
 # Push code from staging branch to the heroku-staging master branch
 git push heroku-staging staging:master
