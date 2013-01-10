@@ -3,7 +3,8 @@ Multiple-Heroku-Environments
 
 Shell script that sets up easy deployment to multiple environments on Heroku  
 
-##Installation
+##Installation:
+
 1) Navigate to your project base directory
 <pre> git clone git@github.com:CEWendel/Multiple-Heroku-Environments.git</pre>
 2) Set execute permissions 
@@ -11,8 +12,11 @@ Shell script that sets up easy deployment to multiple environments on Heroku
 3) Run script
 <pre> Multiple-Heroku-Environments/mult_environ </pre>
 
-##Usage
+##Usage:
+
+Let's set up the staging app, make some changes, and merge them over to the prod app
 ###Staging app
+
 1) Switch to staging branch and make a change
 <pre> git checkout staging </pre>
 2) Commit the change you made on the staging branch
