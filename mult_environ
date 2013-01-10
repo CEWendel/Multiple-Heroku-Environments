@@ -1,64 +1,64 @@
 #!/bin/bash
 
-#	 
-#	Simple script to easily deploy to multiple environments
-#	on Heroku when code is hosted on a remote git repo 
+#  
+# Simple script to easily deploy to multiple environments
+# on Heroku when code is hosted on a remote git repo 
 #
-#	Chris Wendel 
+# Chris Wendel 
 #
 
 # Creates the staging and prod apps
 create_apps(){
-	while true
-	do
-		if $stage_app; then
-			echo "Enter heroku staging app name [Example: My-App-Staging]"
-			remote_name="heroku-staging"
-			read app_name
-			heroku_stage=$app_name
-		else
-			echo "Enter heroku prod app name [Example: My-App-Prod]"
-			remote_name="heroku-prod"
-			read app_name
-			heroku_prod=$app_name
-		fi
+  while true
+  do
+    if $stage_app; then
+      echo "Enter heroku staging app name [Example: My-App-Staging]"
+      remote_name="heroku-staging"
+      read app_name
+      heroku_stage=$app_name
+    else
+      echo "Enter heroku prod app name [Example: My-App-Prod]"
+      remote_name="heroku-prod"
+      read app_name
+      heroku_prod=$app_name
+    fi
 
-		if [[ -n "$app_name" ]]; then
-			# Create the heroku app
-			heroku create $app_name --remote $remote_name
+    if [[ -n "$app_name" ]]; then
+      # Create the heroku app
+      heroku create $app_name --remote $remote_name
 
-			if test $? != 0; then
-				echo "Heroku app name taken"
-			else
-				if $stage_app; then
-					stage_app=false
+      if test $? != 0; then
+        echo "Heroku app name taken"
+      else
+        if $stage_app; then
+          stage_app=false
 
-					# Switch back to the master branch
-					git checkout master
-					
-					# Create the prod app
-					create_apps
-					break
-				else
-					break
-				fi
-			fi
-		else
-			echo "App name cannot be empty"
-		fi
-	done
+          # Switch back to the master branch
+          git checkout master
+          
+          # Create the prod app
+          create_apps
+          break
+        else
+          break
+        fi
+      fi
+    else
+      echo "App name cannot be empty"
+    fi
+  done
 }
 
 if ! [ -d .git ]; then
-	echo "This is not a git repo..."
-	echo "You sure you're in the base directory for your project?"
-	exit -1
+  echo "This is not a git repo..."
+  echo "You sure you're in the base directory for your project?"
+  exit -1
 fi;
 
 git ls-remote origin
 if test $? != 0; then
-	echo "No remote origin, push code to remote repo and try again"
-	exit -1
+  echo "No remote origin, push code to remote repo and try again"
+  exit -1
 fi;
 
 # Ask user for name of secondary(staging) brang
@@ -66,7 +66,7 @@ echo "Enter altername name of staging branch [ENTER to use default 'staging']"
 read name
 
 if [ -z "$name" ]; then
-	name="staging"
+  name="staging"
 fi;
 
 # Create the staging branch
@@ -87,9 +87,9 @@ git push heroku-staging staging:master
 git checkout staging
 
 if [ -f "rakefile" ]; then
-	heroku run rake db:migrate --app $heroku_stage
+  heroku run rake db:migrate --app $heroku_stage
 else
-	echo "No Rakefile found"
+  echo "No Rakefile found"
 fi
 
 # Push code from prod app and migrate the db
@@ -97,8 +97,8 @@ git checkout master
 git push heroku-prod master
 
 if [ -f "rakefile" ]; then
-	heroku run rake db:migrate --app $heroku_prod 
+  heroku run rake db:migrate --app $heroku_prod 
 else
-	echo "No Rakefile found"
+  echo "No Rakefile found"
 fi
 
