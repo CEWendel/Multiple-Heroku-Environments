@@ -7,6 +7,48 @@
 #	Chris Wendel 
 #
 
+# Creates the stage and prod apps
+create_apps(){
+	while true
+	do
+		if $stage_app; then
+			echo "Enter heroku staging app name [Example: My-App-Staging]"
+			remote_name="heroku-staging"
+			read app_name
+			heroku_stage=$app_name
+		else
+			echo "Enter heroku prod app name [Example: My-App-Prod]"
+			remote_name="heroku-prod"
+			read app_name
+			heroku_prod=$app_name
+		fi
+
+		if [[ -n "$app_name" ]]; then
+			# Create the heroku app
+			heroku create $app_name --remote $remote_name
+
+			if test $? != 0; then
+				echo "Heroku app name taken"
+			else
+				if $stage_app; then
+					stage_app=false
+
+					# Switch back to the master branch
+					git checkout master
+					
+					# Create the prod app
+					create_apps
+					break
+				else
+					break
+				fi
+			fi
+		else
+			echo "App name cannot be empty"
+		fi
+	done
+}
+
 if ! [ -d .git ]; then
 	echo "This is not a git repo..."
 	echo "You sure you're in the base directory for your project?"
@@ -35,50 +77,10 @@ git checkout -b $name
 echo "Pushing to remote git repo, branch $name"
 git push origin $name
 
-# Create the staging heroku app
-while true
-do 
-	echo "Enter heroku staging app name [Example: My-App-Staging]"
-	read heroku_stage
+# Initializes to true so stage app is made first and prod app is made second
+stage_app=true
 
-	if [[ -n "$heroku_stage" ]]; then
-		# Create the heroku staging app
-		heroku create $heroku_stage --remote heroku-staging
-
-		if test $? != 0; then
-			echo "Heroku app name taken"
-		else
-			break
-		fi
-	else
-		echo "App name can not be empty"
-	fi
-done
-
-
-# Switch back to the master branch
-git checkout master
-
-
-# Create the prod heroku app
-while true
-do
-	echo "Enter heroku prod app name [Example: My-App-Prod]"
-	read heroku_prod
-
-	if [[ -n "$heroku_prod" ]]; then
-		# Create the heroku staging app
-		heroku create $heroku_prod --remote heroku-prod
-
-		if test $? != 0; then
-			echo "Heroku app name taken"
-		else
-			break
-		fi
-	else
-		echo "App name can not be empty"
-	fi
-done
+create_apps
 
 # Push code from staging branch to the heroku-staging master branch
 git push heroku-staging staging:master
