@@ -23,7 +23,7 @@ Let's set up the staging app, make some changes, and merge them over to the prod
 <pre> git commit -am "Stage file change" </pre>
 3) Push the change to the staging branch of your remote repo (ie. Github)
 <pre> git push origin staging </pre>
-4) Push the change to the master branch of the staging heorku app(heroku-staging)
+4) Push the change to the master branch of the staging heorku app (heroku-staging)
 <pre> git push heroku-staging staging:master </pre>
 5) Open the staging heroku app and make sure you change is displayed
 ###Merging to the master
