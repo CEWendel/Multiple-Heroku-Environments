@@ -7,7 +7,7 @@
 #	Chris Wendel 
 #
 
-# Creates the stage and prod apps
+# Creates the staging and prod apps
 create_apps(){
 	while true
 	do
