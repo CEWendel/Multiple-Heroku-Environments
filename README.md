@@ -24,7 +24,7 @@ Let's set up the staging app, make some changes, and merge them over to the prod
 3) Push the change to the staging branch of your remote repo (ie. Github)
 <pre> git push origin staging </pre>
 4) Push the change to the master branch of the staging heorku app(heroku-staging)
-<pre> git push heroku-staging staging:master
+<pre> git push heroku-staging staging:master </pre>
 5) Open the staging heroku app and make sure you change is displayed
 ###Merging to the master
 * So let's say you are satisfied how the change looks on your staging app, and you want to merge it to your prod app
